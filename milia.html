@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Эмилия, с днём рождения!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 600px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 3.5rem;
+            font-weight: 400;
+            color: #5d4157;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #888;
+            font-weight: 300;
+        }
+
+        .add-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8a6c90 0%, #5d4157 100%);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(93, 65, 87, 0.2);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(93, 65, 87, 0.3);
+        }
+
+        .add-btn i {
+            font-size: 1.2rem;
+        }
+
+        .form-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 400px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -48%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-size: 1.4rem;
+            color: #5d4157;
+            font-weight: 500;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #5d4157;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #8a6c90;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(135deg, #8a6c90 0%, #5d4157 100%);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            opacity: 0.9;
+        }
+
+        .board {
+            width: 100%;
+            max-width: 1200px;
+            min-height: 500px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .sticker {
+            position: absolute;
+            padding: 20px;
+            border-radius: 8px;
+            width: 220px;
+            min-height: 220px;
+            cursor: grab;
+            transition: transform 0.3s, box-shadow 0.3s, z-index 0.3s;
+            overflow-wrap: break-word;
+            z-index: 1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: rotate(0deg);
+            animation: stickAppear 0.5s ease-out;
+        }
+
+        @keyframes stickAppear {
+            from { opacity: 0; transform: scale(0.8) rotate(-3deg); }
+            to { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        .sticker:hover {
+            transform: rotate(0deg) scale(1.02);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+        }
+
+        .sticker-header {
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 1.1rem;
+            color: #5d4157;
+            font-family: 'Caveat', cursive;
+        }
+
+        .sticker-content {
+            margin-bottom: 15px;
+            line-height: 1.5;
+            font-size: 1.05rem;
+            color: #444;
+            font-family: 'Caveat', cursive;
+        }
+
+        .sticker-image {
+            width: 100%;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            color: #888;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s, background 0.3s;
+        }
+
+        .sticker:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: rgba(255, 100, 100, 0.9);
+            color: white;
+        }
+
+        /* Пастельная цветовая палитра от темно-фиолетового до светло-бежевого */
+        .color-1 { background-color: #8a6c90; color: white; } /* темно-фиолетовый */
+        .color-2 { background-color: #a78fa9; color: white; } /* фиолетовый */
+        .color-3 { background-color: #c4b0c5; color: #333; } /* светло-фиолетовый */
+        .color-4 { background-color: #d6c6d6; color: #333; } /* очень светло-фиолетовый */
+        .color-5 { background-color: #e8dde8; color: #333; } /* бледно-фиолетовый */
+        .color-6 { background-color: #f3edf3; color: #333; } /* почти белый с фиолетовым оттенком */
+        .color-7 { background-color: #f9f5f0; color: #333; } /* светло-бежевый */
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        .counter {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+            color: #5d4157;
+            display: flex;
+            align-items: center;
+        }
+
+        .counter i {
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.8rem;
+            }
+            
+            .header {
+                width: 90%;
+            }
+            
+            .add-btn {
+                top: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .counter {
+                bottom: 20px;
+                left: 20px;
+            }
+            
+            .sticker {
+                width: 200px;
+                min-height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.3rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .sticker {
+                width: 180px;
+                min-height: 180px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Эмилия, с днём рождения!</h1>
+        <p class="subtitle">20 лет — это только начало прекрасного пути</p>
+    </div>
+
+    <button class="add-btn" id="show-form-btn">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="form-container" id="form-container">
+        <div class="form-header">
+            <div class="form-title">Новое поздравление</div>
+            <button class="close-btn" id="close-form-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="congratulation-form">
+            <div class="form-group">
+                <label for="name">Ваше имя:</label>
+                <input type="text" id="name" required placeholder="Как вас зовут?">
+            </div>
+            <div class="form-group">
+                <label for="message">Ваше поздравление:</label>
+                <textarea id="message" required placeholder="Напишите ваше пожелание..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="photo">Прикрепить фото (необязательно):</label>
+                <input type="file" id="photo" accept="image/*">
+            </div>
+            <button type="submit"><i class="fas fa-paper-plane"></i> Добавить</button>
+        </form>
+    </div>
+
+    <div class="board" id="board">
+        <!-- Стикеры будут добавляться сюда -->
+    </div>
+
+    <div class="counter">
+        <i class="fas fa-sticky-note"></i>
+        <span id="sticker-count">0</span> поздравлений
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('congratulation-form');
+            const board = document.getElementById('board');
+            const showFormBtn = document.getElementById('show-form-btn');
+            const closeFormBtn = document.getElementById('close-form-btn');
+            const formContainer = document.getElementById('form-container');
+            const overlay = document.getElementById('overlay');
+            const stickerCount = document.getElementById('sticker-count');
+            
+            // Показать форму
+            function showForm() {
+                formContainer.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            // Скрыть форму
+            function hideForm() {
+                formContainer.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                form.reset();
+            }
+            
+            // Обработчики событий для формы
+            showFormBtn.addEventListener('click', showForm);
+            closeFormBtn.addEventListener('click', hideForm);
+            overlay.addEventListener('click', hideForm);
+            
+            // Загрузка стикеров из localStorage при загрузке страницы
+            loadStickers();
+            
+            // Обработка отправки формы
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value;
+                const message = document.getElementById('message').value;
+                const photoFile = document.getElementById('photo').files[0];
+                
+                // Создаем новый стикер
+                createSticker(name, message, photoFile);
+                
+                // Скрываем форму
+                hideForm();
+            });
+            
+            function createSticker(name, message, photoFile = null) {
+                // Создаем элемент стикера
+                const sticker = document.createElement('div');
+                sticker.className = 'sticker';
+                
+                // Добавляем случайный цвет из пастельной палитры
+                const colorClass = 'color-' + (Math.floor(Math.random() * 7) + 1);
+                sticker.classList.add(colorClass);
+                
+                // Содержимое стикера
+                sticker.innerHTML = `
+                    <div class="sticker-header">${name}</div>
+                    <div class="sticker-content">${message}</div>
+                    <button class="delete-btn"><i class="fas fa-times"></i></button>
+                `;
+                
+                // Обработка загруженного фото
+                if (photoFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'sticker-image';
+                        sticker.appendChild(img);
+                        
+                        // Сохраняем стикер после добавления изображения
+                        saveStickers();
+                    };
+                    reader.readAsDataURL(photoFile);
+                } else {
+                    // Сохраняем стикер без изображения
+                    setTimeout(saveStickers, 0);
+                }
+                
+                // Добавляем стикер на доску
+                board.appendChild(sticker);
+                
+                // Делаем стикер перетаскиваемым
+                makeDraggable(sticker);
+                
+                // Добавляем обработчик удаления
+                const deleteBtn = sticker.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sticker.remove();
+                    saveStickers();
+                });
+                
+                // Позиционируем стикер в случайном месте
+                positionSticker(sticker);
+                
+                // Обновляем счетчик
+                updateStickerCount();
+            }
+            
+            function makeDraggable(element) {
+                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                
+                element.onmousedown = dragMouseDown;
+                
+                function dragMouseDown(e) {
+                    // Игнорируем клик по кнопке удаления
+                    if (e.target.closest('.delete-btn')) return;
+                    
+                    e.preventDefault();
+                    // Поднимаем стикер над остальными
+                    element.style.zIndex = 1000;
+                    
+                    // Получаем позицию курсора
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    
+                    document.onmouseup = closeDragElement;
+                    document.onmousemove = elementDrag;
+                }
+                
+                function elementDrag(e) {
+                    e.preventDefault();
+                    
+                    // Вычисляем новую позицию
+                    pos1 = pos3 - e.clientX;
+                    pos2 = pos4 - e.clientY;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    
+                    // Устанавливаем новую позицию
+                    element.style.top = (element.offsetTop - pos2) + "px";
+                    element.style.left = (element.offsetLeft - pos1) + "px";
+                }
+                
+                function closeDragElement() {
+                    // Останавливаем перемещение при отпускании кнопки мыши
+                    document.onmouseup = null;
+                    document.onmousemove = null;
+                    
+                    // Возвращаем нормальный z-index
+                    setTimeout(() => {
+                        element.style.zIndex = 1;
+                    }, 100);
+                    
+                    // Сохраняем новое положение
+                    saveStickers();
+                }
+            }
+            
+            function positionSticker(sticker) {
+                // Случайное положение в пределах доски
+                const boardRect = board.getBoundingClientRect();
+                const maxX = boardRect.width - 250;
+                const maxY = boardRect.height - 250;
+                
+                const randomX = Math.floor(Math.random() * maxX);
+                const randomY = Math.floor(Math.random() * maxY);
+                
+                sticker.style.left = randomX + 'px';
+                sticker.style.top = randomY + 'px';
+            }
+            
+            function saveStickers() {
+                const stickers = [];
+                
+                // Собираем данные о всех стикерах
+                document.querySelectorAll('.sticker').forEach(sticker => {
+                    const name = sticker.querySelector('.sticker-header').textContent;
+                    const message = sticker.querySelector('.sticker-content').textContent;
+                    const image = sticker.querySelector('.sticker-image');
+                    const imageSrc = image ? image.src : null;
+                    const colorClass = Array.from(sticker.classList).find(cls => cls.startsWith('color-'));
+                    const position = {
+                        left: sticker.style.left,
+                        top: sticker.style.top
+                    };
+                    
+                    stickers.push({
+                        name,
+                        message,
+                        imageSrc,
+                        colorClass,
+                        position
+                    });
+                });
+                
+                // Сохраняем в localStorage
+                localStorage.setItem('emiliaStickers', JSON.stringify(stickers));
+                
+                // Обновляем счетчик
+                updateStickerCount();
+            }
+            
+            function loadStickers() {
+                const savedStickers = localStorage.getItem('emiliaStickers');
+                
+                if (savedStickers) {
+                    const stickers = JSON.parse(savedStickers);
+                    
+                    stickers.forEach(stickerData => {
+                        // Создаем элемент стикера
+                        const sticker = document.createElement('div');
+                        sticker.className = `sticker ${stickerData.colorClass}`;
+                        sticker.style.left = stickerData.position.left;
+                        sticker.style.top = stickerData.position.top;
+                        
+                        // Содержимое стикера
+                        sticker.innerHTML = `
+                            <div class="sticker-header">${stickerData.name}</div>
+                            <div class="sticker-content">${stickerData.message}</div>
+                            <button class="delete-btn"><i class="fas fa-times"></i></button>
+                        `;
+                        
+                        // Добавляем изображение, если оно есть
+                        if (stickerData.imageSrc) {
+                            const img = document.createElement('img');
+                            img.src = stickerData.imageSrc;
+                            img.className = 'sticker-image';
+                            sticker.appendChild(img);
+                        }
+                        
+                        // Добавляем стикер на доску
+                        board.appendChild(sticker);
+                        
+                        // Делаем стикер перетаскиваемым
+                        makeDraggable(sticker);
+                        
+                        // Добавляем обработчик удаления
+                        const deleteBtn = sticker.querySelector('.delete-btn');
+                        deleteBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            sticker.remove();
+                            saveStickers();
+                        });
+                    });
+                }
+                
+                // Обновляем счетчик
+                updateStickerCount();
+            }
+            
+            function updateStickerCount() {
+                const count = document.querySelectorAll('.sticker').length;
+                stickerCount.textContent = count;
+            }
+        });
+    </script>
+</body>
+</html>
